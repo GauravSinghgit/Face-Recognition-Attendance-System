@@ -1,0 +1,11 @@
+What is SQLAlchemy?
+It is ORM Model which allow developers to work with database using python object, enabling efficient and
+flexible database access
+
+What is ORM?
+
+ORM Stand for Object Relational Mapping. It is a programming technique used to intract with database where
+by representing table as python class and row as python object.This approach simplifies database 
+operations by allowing developers to work with Python objects instead of writing raw SQL queries. 
+Ex - SQLAlchemy
+

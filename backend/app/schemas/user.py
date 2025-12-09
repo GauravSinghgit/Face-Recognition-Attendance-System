@@ -1,0 +1,27 @@
+from typing import Optional
+from pydantic import BaseModel, EmailStr
+from datetime import datetime
+
+from app.models.user import UserRole
+
+class UserBase(BaseModel):
+    email: EmailStr
+    first_name: str
+    last_name: str
+    identifier: str
+    role: UserRole = UserRole.STUDENT
+    is_active: bool = True
+
+class UserCreate(UserBase):
+    password: str
+
+class UserUpdate(UserBase):
+    password: Optional[str] = None
+
+class User(UserBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True 
