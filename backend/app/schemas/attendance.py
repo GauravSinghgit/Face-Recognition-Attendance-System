@@ -1,14 +1,8 @@
 from typing import Optional, List
 from pydantic import BaseModel
 from datetime import datetime, date
-from enum import Enum
 
 from app.models.attendance import AttendanceStatus
-
-class AttendanceStatus(str, Enum):
-    PRESENT = "present"
-    ABSENT = "absent"
-    LATE = "late"
 
 class AttendanceBase(BaseModel):
     session_id: str
@@ -64,4 +58,4 @@ class MarkAttendanceResponse(BaseModel):
     timestamp: datetime
 
     class Config:
-        from_attributes = True 
+        from_attributes = True  

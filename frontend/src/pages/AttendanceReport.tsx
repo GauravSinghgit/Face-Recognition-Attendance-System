@@ -22,9 +22,9 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { format } from 'date-fns';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
+import { apiClient } from '../store/slices/authSlice';
 
 interface StudentAttendance {
   id: number;
@@ -72,20 +72,16 @@ const AttendanceReport: React.FC = () => {
     setError(null);
 
     try {
-      const response = await axios.get(
-        'http://localhost:8000/api/v1/attendance/report',
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          params: {
-            start_date: format(startDate, 'yyyy-MM-dd'),
-            end_date: format(endDate, 'yyyy-MM-dd'),
-            session_id: sessionId,
-          },
-          withCredentials: true,
-        }
-      );
+      const response = await apiClient.get('/attendance/report', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          start_date: format(startDate, 'yyyy-MM-dd'),
+          end_date: format(endDate, 'yyyy-MM-dd'),
+          session_id: sessionId,
+        },
+      });
 
       setReport(response.data);
     } catch (error: any) {
@@ -275,4 +271,4 @@ const AttendanceReport: React.FC = () => {
   );
 };
 
-export default AttendanceReport; 
+export default AttendanceReport;  

@@ -27,9 +27,9 @@ import {
   PhotoCamera,
   Close,
 } from '@mui/icons-material';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
+import { apiClient } from '../store/slices/authSlice';
 import { Navigate } from 'react-router-dom';
 
 interface CapturedImage {
@@ -49,16 +49,9 @@ const FaceRegistration: React.FC = () => {
 
   const fetchFaceCount = useCallback(async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:8000/api/v1/face/face-count`,
-        {
-          headers: { 
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          withCredentials: true
-        }
-      );
+      const response = await apiClient.get('/face/face-count', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setFaceCount(response.data.face_count);
     } catch (error) {
       console.error('Error fetching face count:', error);
@@ -125,17 +118,12 @@ const FaceRegistration: React.FC = () => {
           formData.append('image', file);
 
           // Upload to server
-          const result = await axios.post(
-            `http://localhost:8000/api/v1/face/register-face`,
-            formData,
-            {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-                Authorization: `Bearer ${token}`,
-              },
-              withCredentials: true
-            }
-          );
+          const result = await apiClient.post('/face/register-face', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${token}`,
+            },
+          });
 
           successCount++;
           console.log('Face registration successful:', result.data.message);
@@ -361,4 +349,4 @@ const FaceRegistration: React.FC = () => {
   );
 };
 
-export default FaceRegistration; 
+export default FaceRegistration;  

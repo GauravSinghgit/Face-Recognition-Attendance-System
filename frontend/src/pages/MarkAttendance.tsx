@@ -11,9 +11,9 @@ import {
   Alert,
 } from '@mui/material';
 import { CameraAlt } from '@mui/icons-material';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
+import { apiClient } from '../store/slices/authSlice';
 import AttendanceReport from '../components/AttendanceReport';
 
 const MarkAttendance: React.FC = () => {
@@ -52,17 +52,15 @@ const MarkAttendance: React.FC = () => {
       formData.append('image', file);
 
       // Mark attendance
-      const result = await axios.post(
-        `http://localhost:8000/api/v1/face/mark-attendance?session_id=${sessionId}`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true
-        }
-      );
+      const result = await apiClient.post('/face/mark-attendance', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          session_id: sessionId,
+        },
+      });
 
       setSuccess('Attendance marked successfully!');
       setAttendanceReport(result.data);
@@ -173,4 +171,4 @@ const MarkAttendance: React.FC = () => {
   );
 };
 
-export default MarkAttendance; 
+export default MarkAttendance;  

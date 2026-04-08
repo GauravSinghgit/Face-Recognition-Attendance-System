@@ -2,21 +2,19 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 
 // Configure axios base URL and API prefix
-const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
-const API_PREFIX = '/api/v1';
+export const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+export const API_PREFIX = '/api/v1';
+export const API_BASE = `${BASE_URL}${API_PREFIX}`;
 
 // Create axios instance with base configuration
-const apiClient = axios.create({
-  baseURL: `${BASE_URL}${API_PREFIX}`,
+export const apiClient = axios.create({
+  baseURL: API_BASE,
   headers: {
     'Content-Type': 'application/json',
   },
   withCredentials: true,  // Important for CORS
   timeout: 30000, // Increased to 30 seconds
 });
-
-// Debug logging
-console.log('API endpoint configured as:', `${BASE_URL}${API_PREFIX}`);
 
 // Types
 export interface User {
@@ -50,10 +48,9 @@ const checkServerAvailability = async () => {
     try {
       await axios.get(`${BASE_URL}/`, { 
         timeout: 5000,
-        withCredentials: true,  // Important for CORS
+        withCredentials: true,
         headers: {
           'Accept': 'application/json',
-          'Access-Control-Allow-Origin': 'http://localhost:3000'
         }
       });
       return true;
@@ -62,10 +59,9 @@ const checkServerAvailability = async () => {
       const altBaseUrl = BASE_URL.replace('localhost', '127.0.0.1');
       await axios.get(`${altBaseUrl}/`, { 
         timeout: 5000,
-        withCredentials: true,  // Important for CORS
+        withCredentials: true,
         headers: {
           'Accept': 'application/json',
-          'Access-Control-Allow-Origin': 'http://localhost:3000'
         }
       });
       return true;

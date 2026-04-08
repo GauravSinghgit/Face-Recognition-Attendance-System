@@ -29,10 +29,10 @@ import {
   VideocamOff,
   PhotoLibrary,
 } from '@mui/icons-material';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { format } from 'date-fns';
 import { RootState } from '../store';
+import { apiClient } from '../store/slices/authSlice';
 import { Navigate } from 'react-router-dom';
 
 interface AttendanceRecord {
@@ -71,22 +71,16 @@ const AttendanceMarking: React.FC = () => {
   const handleImageUpload = async (file: File) => {
     const formData = new FormData();
     formData.append('image', file);
-    formData.append('session_id', sessionId);
 
-    const result = await axios.post(
-      `http://localhost:8000/api/v1/face/mark-attendance`,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`,
-        },
-        params: {
-          session_id: sessionId,
-        },
-        withCredentials: true
-      }
-    );
+    const result = await apiClient.post('/face/mark-attendance', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        session_id: sessionId,
+      },
+    });
 
     setReport(result.data);
     setSuccess(`Attendance marked successfully. Present: ${result.data.present_count}, Absent: ${result.data.absent_count}`);
@@ -401,4 +395,4 @@ const AttendanceMarking: React.FC = () => {
   );
 };
 
-export default AttendanceMarking; 
+export default AttendanceMarking;  
