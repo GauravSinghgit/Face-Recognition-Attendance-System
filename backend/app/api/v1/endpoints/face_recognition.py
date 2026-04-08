@@ -139,9 +139,17 @@ async def mark_attendance(
         matches = face_service.process_attendance_image(image_path, known_faces)
         logger.info(f"Found {len(matches)} face matches in attendance image")
         
-        # Record attendance for matched users
+        # Record attendance for matched users (skip if already recorded for this session)
         attendance_records = []
         for user, confidence in matches:
+            existing = db.query(Attendance).filter(
+                Attendance.user_id == user.id,
+                Attendance.session_id == session_id
+            ).first()
+            if existing:
+                logger.debug(f"Attendance already recorded for user {user.id} in session {session_id}, skipping")
+                attendance_records.append(existing)
+                continue
             attendance = Attendance(
                 user_id=user.id,
                 session_id=session_id,
@@ -158,10 +166,17 @@ async def mark_attendance(
         all_students = db.query(User).filter(User.role == UserRole.STUDENT).all()
         total_students = len(all_students)
         
-        # Mark absent for non-matched students
+        # Mark absent for non-matched students (skip if already recorded)
         present_student_ids = {record.user_id for record in attendance_records}
         for student in all_students:
             if student.id not in present_student_ids:
+                existing = db.query(Attendance).filter(
+                    Attendance.user_id == student.id,
+                    Attendance.session_id == session_id
+                ).first()
+                if existing:
+                    attendance_records.append(existing)
+                    continue
                 absent_record = Attendance(
                     user_id=student.id,
                     session_id=session_id,
@@ -205,6 +220,8 @@ async def mark_attendance(
         
         return report
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error during attendance marking: {str(e)}")
         if 'image_path' in locals() and os.path.exists(image_path):
@@ -241,4 +258,4 @@ async def get_face_count(
         raise HTTPException(
             status_code=500,
             detail="Error retrieving face count"
-        ) 
+        )  

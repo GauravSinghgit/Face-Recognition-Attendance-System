@@ -23,7 +23,7 @@ interface Student {
   created_at: string;
   student_name: string;
   student_email: string;
-  student_roll_number: string | null;
+  student_identifier: string | null;
 }
 
 interface AttendanceReportProps {
@@ -43,7 +43,7 @@ const AttendanceReport: React.FC<AttendanceReportProps> = ({
   attendance_list,
   timestamp,
 }) => {
-  const attendanceRate = (present_count / total_students) * 100;
+  const attendanceRate = total_students > 0 ? (present_count / total_students) * 100 : 0;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -122,7 +122,7 @@ const AttendanceReport: React.FC<AttendanceReportProps> = ({
                     {student.student_email}
                   </Typography>
                 </TableCell>
-                <TableCell>{student.student_roll_number || '-'}</TableCell>
+                <TableCell>{student.student_identifier || '-'}</TableCell>
                 <TableCell>
                   <Chip
                     label={student.status.charAt(0).toUpperCase() + student.status.slice(1)}
@@ -132,7 +132,7 @@ const AttendanceReport: React.FC<AttendanceReportProps> = ({
                 </TableCell>
                 <TableCell>
                   {student.status === 'present' 
-                    ? `${(student.confidence_score).toFixed(1)}%`
+                    ? `${(student.confidence_score * 100).toFixed(1)}%`
                     : '-'
                   }
                 </TableCell>
@@ -148,4 +148,4 @@ const AttendanceReport: React.FC<AttendanceReportProps> = ({
   );
 };
 
-export default AttendanceReport; 
+export default AttendanceReport;  

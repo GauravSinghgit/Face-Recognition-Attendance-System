@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Optional
 from pydantic_settings import BaseSettings
-from pydantic import AnyHttpUrl, EmailStr
+from pydantic import AnyHttpUrl, EmailStr, model_validator
 from urllib.parse import quote_plus
 
 class Settings(BaseSettings):
@@ -9,15 +9,15 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     
     # Security
-    SECRET_KEY: str = "your-secret-key-here"  # Change in production
+    SECRET_KEY: str = "change-me-in-production"  # Override via SECRET_KEY env var
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
     
     # Database
     POSTGRES_SERVER: str = "localhost"
     POSTGRES_USER: str = "postgres"
-    POSTGRES_PASSWORD: str = "gaurav2237864"  # Updated password
+    POSTGRES_PASSWORD: str = "postgres"
     POSTGRES_DB: str = "attendance_db"
-    SQLALCHEMY_DATABASE_URI: str = f"postgresql://{POSTGRES_USER}:{quote_plus(POSTGRES_PASSWORD)}@{POSTGRES_SERVER}/{POSTGRES_DB}"
+    SQLALCHEMY_DATABASE_URI: Optional[str] = None
    
     # Redis
     REDIS_HOST: str = "localhost"
@@ -43,9 +43,19 @@ class Settings(BaseSettings):
     # Admin user
     FIRST_SUPERUSER: EmailStr = "admin@example.com"
     FIRST_SUPERUSER_PASSWORD: str = "admin123"
+
+    @model_validator(mode="after")
+    def assemble_db_uri(self) -> "Settings":
+        if self.SQLALCHEMY_DATABASE_URI is None:
+            self.SQLALCHEMY_DATABASE_URI = (
+                f"postgresql://{self.POSTGRES_USER}"
+                f":{quote_plus(self.POSTGRES_PASSWORD)}"
+                f"@{self.POSTGRES_SERVER}/{self.POSTGRES_DB}"
+            )
+        return self
     
     class Config:
         case_sensitive = True
         env_file = ".env"
 
-settings = Settings() 
+settings = Settings()   

@@ -57,7 +57,26 @@ async def get_attendance_records(
         # Execute query
         records = query.order_by(Attendance.created_at.desc()).all()
         logger.info(f"Successfully retrieved {len(records)} attendance records")
-        return records
+
+        # Transform ORM objects to include student info required by response model
+        response_records = []
+        for record in records:
+            student = db.query(User).filter(User.id == record.user_id).first()
+            if student:
+                response_records.append(
+                    AttendanceResponse(
+                        id=record.id,
+                        user_id=record.user_id,
+                        session_id=record.session_id,
+                        status=record.status,
+                        confidence_score=record.confidence_score,
+                        created_at=record.created_at,
+                        student_name=f"{student.first_name} {student.last_name}",
+                        student_email=student.email,
+                        student_identifier=student.identifier,
+                    )
+                )
+        return response_records
     except Exception as e:
         logger.error(f"Error retrieving attendance records: {str(e)}")
         raise HTTPException(
@@ -233,4 +252,4 @@ async def delete_attendance_record(
         raise HTTPException(
             status_code=500,
             detail="Error deleting attendance record"
-        )   
+        )      
