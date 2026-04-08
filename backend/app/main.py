@@ -21,7 +21,7 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React app's URL
+    allow_origins=[str(origin) for origin in settings.ALLOWED_ORIGINS],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -41,7 +41,8 @@ logger.info(f"Successfully mounted static files directory at: {static_dir}")
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     start_time = time.time()
-    logger.info(f"Request started - Method: {request.method}, URL: {request.url}, Client: {request.client.host}")
+    client_host = request.client.host if request.client else "unknown"
+    logger.info(f"Request started - Method: {request.method}, URL: {request.url}, Client: {client_host}")
     
     response = await call_next(request)
     

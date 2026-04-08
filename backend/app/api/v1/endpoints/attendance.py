@@ -225,10 +225,12 @@ async def delete_attendance_record(
         
         logger.info(f"Successfully deleted attendance record: {attendance_id}")
         return {"message": "Attendance record deleted successfully"}
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error deleting attendance record: {str(e)}")
         db.rollback()
         raise HTTPException(
             status_code=500,
             detail="Error deleting attendance record"
-        ) 
+        )   
