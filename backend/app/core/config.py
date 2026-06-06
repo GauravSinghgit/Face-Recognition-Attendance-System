@@ -15,8 +15,8 @@ class Settings(BaseSettings):
     # Database
     POSTGRES_SERVER: str = "localhost"
     POSTGRES_USER: str = "postgres"
-    POSTGRES_PASSWORD: str = "gaurav2237864"  # Updated password
-    POSTGRES_DB: str = "attendance_db"
+    POSTGRES_PASSWORD: str = ""  # Updated password
+    POSTGRES_DB: str = ""
     SQLALCHEMY_DATABASE_URI: str = f"postgresql://{POSTGRES_USER}:{quote_plus(POSTGRES_PASSWORD)}@{POSTGRES_SERVER}/{POSTGRES_DB}"
    
     # Redis
@@ -41,8 +41,6 @@ class Settings(BaseSettings):
     MAX_IMAGE_SIZE: int = 10 * 1024 * 1024  # 10MB
     
     # Admin user
-    FIRST_SUPERUSER: EmailStr = "admin@example.com"
-    FIRST_SUPERUSER_PASSWORD: str = "admin123"
     
     class Config:
         case_sensitive = True
